@@ -14,7 +14,7 @@
 #include <ti/sdo/dmai/Cpu.h>
 #include <ti/sdo/dmai/Time.h>
 #include <ti/sdo/dmai/BufTab.h>
-#include <ti/sdo/dmai/Colorspace.h>
+#include <ti/sdo/dmai/ColorSpace.h>
 #include <ti/sdo/dmai/Capture.h>
 #include <ti/sdo/dmai/Framecopy.h>
 #include <ti/sdo/dmai/BufferGfx.h>
@@ -228,7 +228,7 @@ Int main(Int argc, Char *argv[])
 
     if (inFile == NULL) {
         ret = Dmai_EFAIL;
-        fprintf(stderr,"Failed to open input file %s\n", args->inFile);
+        fprintf(stderr,"Failed to open input file %s\n", args.inFile);
         goto cleanup;
     }
 
@@ -244,7 +244,7 @@ Int main(Int argc, Char *argv[])
 
     if (outFile == NULL) {
         ret = Dmai_EFAIL;
-        fprintf(stderr,"Failed to open output file %s\n", args->outFile);
+        fprintf(stderr,"Failed to open output file %s\n", args.outFile);
         goto cleanup;
     }
 
@@ -285,11 +285,11 @@ Int main(Int argc, Char *argv[])
     dynParams.inputHeight = params.maxHeight;
 
     /* Create the video encoder */
-    hVe1 = Venc1_create(hEngine, args->codecName, &params, &dynParams);
+    hVe1 = Venc1_create(hEngine, args.codecName, &params, &dynParams);
 
     if (hVe1 == NULL) {
         ret = Dmai_EFAIL;
-        fprintf(stderr,"Failed to create video encoder: %s\n", args->codecName);
+        fprintf(stderr,"Failed to create video encoder: %s\n", args.codecName);
         goto cleanup;
     }
 

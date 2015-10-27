@@ -13,8 +13,4 @@ Int readFrame420P(Buffer_Handle hBuf, FILE *outFile, Int imageHeight);
 
 Int readFrame420SP(Buffer_Handle hBuf, FILE *outFile, Int imageHeight);
 
-Int readFrameUYVY(Buffer_Handle hBuf, FILE *outFile);
-
-Void processReconData(IVIDEO1_BufDesc* reconBufs, Buffer_Handle hSrcBuf, Buffer_Handle hDstBuf);
-
 #endif
