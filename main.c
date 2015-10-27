@@ -43,29 +43,39 @@ static Char vbufferOut[VBUFSIZE];
 
 typedef enum
 {
+   ArgID_BENCHMARK = 256,
    ArgID_BITRATE,
    ArgID_CODEC,
    ArgID_ENGINE,
    ArgID_HELP,
    ArgID_INPUT_FILE,
+   ArgID_CACHE,
    ArgID_NUMFRAMES,
    ArgID_OUTPUT_FILE,
+   ArgID_RECON_FILE,
    ArgID_RESOLUTION,
+   ArgID_SP,
    ArgID_NUMARGS
 } ArgID;
 
+/* Arguments for app */
 typedef struct Args {
     Int   numFrames;
     Int   width;
     Int   height;
     Int   bitRate;
+    Int   benchmark;
+    Bool  cache;
+    Bool  writeReconFrames;
+    Bool  sp;
     Char  codecName[MAX_CODEC_NAME_SIZE];
     Char  inFile[MAX_FILE_NAME_SIZE];
     Char  outFile[MAX_FILE_NAME_SIZE];
+    Char  reconFile[MAX_FILE_NAME_SIZE];
     Char  engineName[MAX_ENGINE_NAME_SIZE];
 } Args;
 
-#define DEFAULT_ARGS { 100, 0, 0, -1}
+#define DEFAULT_ARGS { 100, 0, 0, -1, FALSE, FALSE, FALSE, FALSE }
 
 static Void usage(void)
 {
@@ -86,22 +96,26 @@ static Void usage(void)
 
 static Void parseArgs(Int argc, Char *argv[], Args *argsp)
 {
-    const char shortOptions[] = "b:c:e:hi:n:o:r";
+    const char shortOptions[] = "b:c:e:hi:n:o:r:";
 
     const struct option longOptions[] = {
-        {"bitrate", required_argument, NULL, ArgID_BITRATE},
-        {"codec", required_argument, NULL, ArgID_CODEC},
-        {"engine", required_argument, NULL, ArgID_ENGINE},
-        {"help", no_argument, NULL, ArgID_HELP},
-        {"input_file", required_argument, NULL, ArgID_INPUT_FILE},
-        {"numframes", required_argument, NULL, ArgID_NUMFRAMES},
-        {"output_file", required_argument, NULL, ArgID_OUTPUT_FILE},
-        {"resolution", required_argument, NULL, ArgID_RESOLUTION},
+        {"benchmark",       no_argument,       NULL, ArgID_BENCHMARK   },
+        {"bitrate",         required_argument, NULL, ArgID_BITRATE     },
+        {"codec",           required_argument, NULL, ArgID_CODEC       },
+        {"engine",          required_argument, NULL, ArgID_ENGINE      },
+        {"help",            no_argument,       NULL, ArgID_HELP        },
+        {"input_file",      required_argument, NULL, ArgID_INPUT_FILE  },
+        {"cache",           no_argument,       NULL, ArgID_CACHE       },
+        {"numframes",       required_argument, NULL, ArgID_NUMFRAMES   },
+        {"output_file",     required_argument, NULL, ArgID_OUTPUT_FILE },
+        {"recon_file",      required_argument, NULL, ArgID_RECON_FILE  },
+        {"resolution",      required_argument, NULL, ArgID_RESOLUTION  },
+        {"semiplanar",      no_argument,       NULL, ArgID_SP          },
         {0, 0, 0, 0}
     };
 
-    Int  codec = FALSE;
-    Int  inFile = FALSE;
+    Int  codec   = FALSE;
+    Int  inFile  = FALSE;
     Int  outFile = FALSE;
     Int  index;
     Int  argID;
@@ -116,6 +130,11 @@ static Void parseArgs(Int argc, Char *argv[], Args *argsp)
         }
 
         switch (argID) {
+
+            case ArgID_BENCHMARK:
+                argsp->benchmark = TRUE;
+                break;
+
             case ArgID_BITRATE:
             case 'b':
                 argsp->bitRate = atoi(optarg);
@@ -142,6 +161,10 @@ static Void parseArgs(Int argc, Char *argv[], Args *argsp)
                 strncpy(argsp->inFile, optarg, MAX_FILE_NAME_SIZE);
                 inFile = TRUE;
                 break;
+
+            case ArgID_CACHE:
+                argsp->cache = TRUE;
+                break;
                 
             case ArgID_NUMFRAMES:
             case 'n':
@@ -152,6 +175,15 @@ static Void parseArgs(Int argc, Char *argv[], Args *argsp)
             case 'o':
                 strncpy(argsp->outFile, optarg, MAX_FILE_NAME_SIZE);
                 outFile = TRUE;
+                break;
+
+            case ArgID_RECON_FILE:
+                strncpy(argsp->reconFile, optarg, MAX_FILE_NAME_SIZE);
+                argsp->writeReconFrames = TRUE;
+                break;
+
+            case ArgID_SP:
+                argsp->sp = TRUE;
                 break;
 
             case ArgID_RESOLUTION:
@@ -165,8 +197,7 @@ static Void parseArgs(Int argc, Char *argv[], Args *argsp)
                 }
 
                 if (argsp->width % 8 || argsp->height % 8) {
-                    fprintf(stderr, "Width and height must be multiple of 8\n");
-                }
+                    fprintf(stderr, "Width and height must be multiple of 8\n");                }
                 break;
 
             default:
