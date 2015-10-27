@@ -2,6 +2,7 @@
 dm368 h264 encoder sample app
 
 Usage: video_encode [options]
+
         Options:
              --benchmark      Print benchmarking information
         -b | --bitrate        Bitrate used to process video stream [variable]
